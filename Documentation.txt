@@ -1,1 +1,17 @@
 ﻿## ClientTicketAPI Documentation
+
+ClientTicketAPI has business layer with controllers, repository microservice middle layer and data access layer with dbContext.
+
+All the controllers has business logic, they no need relation to dbContext.
+They are using repository microservice's methods to access the dbContext and save changes to database.
+
+Union of all controllers methods is in repository microservice.
+
+Those are the following methods:
+
+        1. int GetIdKorisnik(string ime, string prezime);
+        2. Akt_Tiket GetCreatedTiket(object id);
+        3. Akt_Tiket GetStartedTiket(object id);
+        4. Akt_Tiket GetFinishedTiket(object id);
+        5. public string GetClientTicketDocNo();
+        6. void SaveToDB(Akt_Tiket noviTiket);

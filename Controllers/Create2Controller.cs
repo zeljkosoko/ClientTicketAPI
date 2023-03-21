@@ -1,11 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Data.SqlTypes;
-using Microsoft.Data.SqlClient;
 using ClientTicketAPI.Repository;
 using ClientTicketAPI.CustomModels;
 using ClientTicketAPI.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace ClientTicketAPI.Controllers
 {
@@ -13,21 +10,21 @@ namespace ClientTicketAPI.Controllers
     [ApiController]
     public class Create2Controller : ControllerBase
     {
-        private readonly ITicketRepository iRepository; //Repository microservis u api servisu komunicira sa dbContextom
+        private readonly ITicketRepository microserviceForDAL; //Repository microservis u api servisu komunicira sa dbContextom
 
         public Create2Controller(ITicketRepository _iRepository)
         {
-            iRepository = _iRepository;
+            microserviceForDAL = _iRepository;
         }
+
         [HttpPost]
         public string Create2(TiketVM tiketVM)
         {
-            //string inicijator, string naslov, string opis
-            //ako su podaci pogresnog tipa, servis nece ni da se odazove
+            //Servis ocekuje da dobije samo: string inicijator, string naslov, string opis - inace se ne odaziva
             //inicijator moze imati razlicit id kod nas i kod klijenta jer ima vise klijenata-zato prvo trazimo id od klijenta u bazi pa ga onda saljemo da je on zahtevao
             try
             {
-                int idInicijator = iRepository.GetIdKorisnik(tiketVM.inicijatorIme, tiketVM.inicijatorPrezime);
+                int idInicijator = microserviceForDAL.GetIdKorisnik(tiketVM.inicijatorIme, tiketVM.inicijatorPrezime);
 
                 Akt_Tiket zebraconTicket = new Akt_Tiket
                 {
@@ -38,22 +35,18 @@ namespace ClientTicketAPI.Controllers
                     PoslatTiket = true,
                     RadnikKreiran = 1, //Uvek Zebracon Solutions kod njih
                     Status = 1,
-                    Tiket = iRepository.GetClientTicketDocNo()
+                    Tiket = microserviceForDAL.GetClientTicketDocNo()
                 };
 
-                iRepository.InsertToDB(zebraconTicket);
+                microserviceForDAL.SaveToDB(zebraconTicket);
 
                 string result = zebraconTicket.Tiket + "/" + zebraconTicket.Id;
-
                 return result;
             }
-           
-            catch (Exception ex) //radi re-throw od TicketRepository exception
+            catch (Exception ex) //re-throw od Repository exception
             {
                 return ex.Message;
             }
         }
-
-        
     }
 }

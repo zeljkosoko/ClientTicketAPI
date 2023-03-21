@@ -7,15 +7,15 @@ using ClientTicketAPI.CustomModels;
 
 namespace ClientTicketAPI.Repository
 {
-    //Ovde se enkapsulirane sve metode za DAL, koje kontroleri zahtevaju od dbContexta
+    //REPOSITORY Microservice communicates with DAL
+    //It encapsulates methods for DAL and controllers no need dbContext
     public interface ITicketRepository
     {
         int GetIdKorisnik(string ime, string prezime);
-        void InsertToDB(Akt_Tiket noviTiket);
         Akt_Tiket GetCreatedTiket(object id);
         Akt_Tiket GetStartedTiket(object id);
         Akt_Tiket GetFinishedTiket(object id);
-        public string GetClientTicketDocNo();
-        void SaveToDB();
+        string GetClientTicketDocNo();
+        void SaveToDB(Akt_Tiket noviTiket);
     }
 }

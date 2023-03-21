@@ -33,6 +33,14 @@ namespace ClientTicketAPI
                     Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddControllers();
+
+            //----jedna instanca servisa se vrti za ISTI I RAZLICITI request
+            //services.AddSingleton<ITicketRepository, TicketRepository>();
+            
+            //-----jedna instanca servisa se vrti za JEDAN ISTI request
+            //services.AddScoped<ITicketRepository, TicketRepository>();
+
+            //-----jedna instanca servisa po jednom requestu
             services.AddTransient<ITicketRepository, TicketRepository>();
         }
 

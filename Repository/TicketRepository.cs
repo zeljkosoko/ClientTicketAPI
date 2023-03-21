@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 using ClientTicketAPI.Models;
 using Microsoft.EntityFrameworkCore;
 using ClientTicketAPI.CustomModels;
+using System.Data.SqlTypes;
+using Microsoft.Data.SqlClient;
+using System.Data.Common;
 
 namespace ClientTicketAPI.Repository
 {
@@ -54,6 +57,14 @@ namespace ClientTicketAPI.Repository
             {
                 throw new ArgumentNullException("tiket nije kreiran.");
             }
+            catch (NullReferenceException)
+            {
+                throw new NullReferenceException("Ne postoji takav tiket ili je već započet.");
+            }
+            catch (SqlNullValueException)
+            {
+                throw new SqlNullValueException( "Korisnik ili datum u bazi ne može biti prazan.");
+            }
             catch (Exception)
             {
                 throw new Exception("Opsta greska- tiket nije kreiran.");
@@ -89,18 +100,6 @@ namespace ClientTicketAPI.Repository
             catch (Exception)
             {
                 throw new Exception("Opsta greska- tiket nije zavrsen.");
-            }
-        }
-        public void InsertToDB(Akt_Tiket noviTiket)
-        {
-            dbContext.Akt_Tiket.Add(noviTiket);
-            try
-            {
-                SaveToDB();
-            }
-            catch (Exception)
-            {
-                throw; //re-throw exception from SaveToDB
             }
         }
         public string GetClientTicketDocNo()
@@ -163,15 +162,16 @@ namespace ClientTicketAPI.Repository
                 throw new Exception("Opsta greska- GetClientTicketDocNo");
             }
         }
-        public void SaveToDB()
+        public void SaveToDB(Akt_Tiket noviTiket)
         {
             try
             {
+                dbContext.Akt_Tiket.Add(noviTiket);
                 dbContext.SaveChanges();
             }
             catch (DbUpdateException)
             {
-                throw new DbUpdateException("Tiket nije sacuvan u bazi.");
+                throw new DbUpdateException("Tiket nije sacuvan u bazi, servisu nisu prosledjeni ispravni podaci.");
             }
             catch (Exception)
             {
